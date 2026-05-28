@@ -53,7 +53,7 @@
 <body>
 
     <header>
-        <h1>NU Cebu Library Portal</h1>
+        <h1>NU Cebu Library System</h1>
         <div id="auth-status-area">
             <button class="btn-sec" onclick="showView('login-view')">University CAS Login</button>
         </div>
@@ -64,135 +64,139 @@
         <div id="home-view" class="view-panel">
             <div class="grid-2">
                 <div>
-                    <h2>Public Book Catalog</h2>
-                    <input type="text" id="home-search-input" placeholder="🔍 Search books by title, author, or ISBN..." oninput="publicSearchBooks()">
-                    <div id="home-books-box" class="display-box">Loading digital library catalog...</div>
+                    <h2>Book Catalog</h2>
+                    <input type="text" id="home-search-input" placeholder="🔍 Search by title, author, or ISBN..." oninput="publicSearchBooks()">
+                    <div id="home-books-box" class="display-box">Loading books...</div>
                 </div>
                 <div style="border-left: 1px solid var(--gray); padding-left: 30px;">
-                    <h2>Physical Counter Service</h2>
-                    <p style="font-size: 14px; color: #666;">Have a physical token ready? Type your active structural dispatch code below to process items directly from holds.</p>
-                    <label><strong>Enter Physical Borrow Token:</strong></label>
+                    <h2>Book Claim</h2>
+                    <p style="font-size: 14px; color: #666;">Have a claim code? Enter it below.</p>
+                    <label><strong>Enter Claim Code:</strong></label>
                     <input type="text" id="home-token-input" placeholder="e.g. BRW-123456">
-                    <button style="width:100%" onclick="processPhysicalToken()">Claim Desked Document</button>
+                    <button style="width:100%" onclick="processPhysicalToken()">Claim Book</button>
                     <div id="home-token-feedback" style="margin-top: 15px; font-weight: bold;"></div>
                 </div>
             </div>
         </div>
 
         <div id="login-view" class="view-panel hidden" style="max-width: 450px; margin: 40px auto;">
-            <h2>University Authentication Gate</h2>
-            <p style="font-size:12px; margin-top:-10px; color:#777;">Central Authentication Service (CAS) for National University</p>
-            <label>User ID or Email Address</label>
-            <input type="text" id="login-ident" placeholder="ID Number or official email">
+            <h2>Login</h2>
+            <p style="font-size:12px; margin-top:-10px; color:#777;">National University login</p>
+            <label>Email or ID</label>
+            <input type="text" id="login-ident" placeholder="Email or ID">
             <label>Password</label>
             <input type="password" id="login-pass" placeholder="••••••••">
             <div style="display:flex; justify-content: space-between; align-items:center; margin-bottom: 20px;">
                 <a href="#" style="font-size:12px; color: var(--primary);" onclick="alert('Account recovery notification sent. Please contact System Administrator Jem for priority credential override management.')">Forgot Password?</a>
                 <a href="#" style="font-size:12px; color: #555;" onclick="showView('home-view')">Back to Homepage</a>
             </div>
-            <button style="width: 100%" onclick="handleLogin()">Authorize Session</button>
+            <button style="width: 100%" onclick="handleLogin()">Login</button>
             <p id="login-error" style="color:var(--danger); text-align:center; font-weight:bold; font-size:13px;"></p>
         </div>
 
         <div id="student-view" class="view-panel hidden">
             <div class="tab-bar">
-                <button class="tab-btn active" onclick="switchTab(this, 'student-tab1')">Circulation Desk</button>
-                <button class="tab-btn" onclick="switchTab(this, 'student-tab2')">Digital Media Suite</button>
-                <button class="tab-btn" onclick="switchTab(this, 'student-tab3')">Smart Workspace Scheduler</button>
-                <button class="tab-btn" onclick="switchTab(this, 'student-tab4')">Account Security</button>
+                <button class="tab-btn active" onclick="switchTab(this, 'student-tab1')">Borrowing</button>
+                <button class="tab-btn" onclick="switchTab(this, 'student-tab2')">Digital Resources</button>
+                <button class="tab-btn" onclick="switchTab(this, 'student-tab3')">Room Booking</button>
+                <button class="tab-btn" onclick="switchTab(this, 'student-tab4')">Password</button>
             </div>
 
             <div id="student-tab1" class="tab-content">
                 <div class="grid-2">
                     <div>
-                        <h3>Reservable Titles</h3>
-                        <p style="font-size:12px; color:#666;">Select a collection volume to inspect checkout terms.</p>
+                        <h3>Books</h3>
+                        <p style="font-size:12px; color:#666;">Choose a book to see details.</p>
                         <div id="student-books-box" class="display-box">Loading catalogs...</div>
                         <div style="margin-top:15px; background:#f8f9fa; padding:15px; border-radius:6px; border:1px solid var(--gray);">
-                            <p id="selected-book-meta"><em>No book selected from the display box.</em></p>
-                            <button id="place-hold-btn" class="hidden" onclick="executeHold()">Place Physical Document Hold</button>
+                            <p id="selected-book-meta"><em>No book selected.</em></p>
+                            <button id="place-hold-btn" class="hidden" onclick="executeHold()">Reserve Book</button>
                         </div>
                     </div>
                     <div>
-                        <h3>Active Operations Token Gallery</h3>
+                        <h3>Your QR Code</h3>
                         <div id="student-qr-area" class="hidden" style="text-align:center; padding: 15px; background:#fffde6; border:1px dashed #e67e22; border-radius:6px;">
-                            <span style="font-weight:bold; color:#e67e22;">DISPATCH READY</span>
-                            <div class="qr-placeholder" id="qr-target">QR BLOCK CODE</div>
-                            <small>Present this barcode to the counter scanner, or enter token <strong id="token-text-render"></strong> at the public terminal box.</small>
+                            <span style="font-weight:bold; color:#e67e22;">READY</span>
+                            <div class="qr-placeholder" id="qr-target">QR CODE</div>
+                            <small>Show this QR code at the counter, or enter code <strong id="token-text-render"></strong> at the terminal.</small>
                         </div>
-                        <h3>Your Historical Circulation Activity</h3>
-                        <div id="student-history-box">Loading system transactions...</div>
+                        <h3>Your Borrowing History</h3>
+                        <div id="student-history-box">Loading history...</div>
                     </div>
                 </div>
             </div>
 
             <div id="student-tab2" class="tab-content hidden">
-                <h3>Institutional Digital Repositories</h3>
-                <p>Access high-definition open-source electronic resources directly curated by university administration.</p>
+                <h3>Digital Resources</h3>
+                <p>Open digital resources selected by the university.</p>
                 <div id="digital-resources-grid" class="grid-3">Loading media resources...</div>
             </div>
 
             <div id="student-tab3" class="tab-content hidden">
                 <div class="grid-2">
                     <div>
-                        <h3>Reserve a Facility Component</h3>
-                        <label>Select Target Smart Unit Room</label>
+                        <h3>Book a Room</h3>
+                        <label>Select Room</label>
                         <select id="room-select">
                             <option value="Smart Room 1">Smart Room 1</option>
                             <option value="Smart Room 2">Smart Room 2</option>
                             <option value="Collab Hub A">Collab Hub A</option>
                         </select>
-                        <label>Reservation Date Target</label>
+                        <label>Date</label>
                         <input type="date" id="room-date-input">
-                        <label>Time Block Slot Select (30-Minute Maximum Length Windows)</label>
+                        <label>Time</label>
                         <select id="room-time-select">
                             </select>
-                        <label>Invite Team Collaborators (Required Format: comma-separated emails)</label>
+                        <label>Invite emails (comma-separated)</label>
                         <textarea id="room-invites-input" rows="2" placeholder="classmate1@students.nu-cebu.edu.ph, classmate2@students.nu-cebu.edu.ph"></textarea>
-                        <button onclick="executeRoomReservation()">Lock Reservation Workspace</button>
+                        <button onclick="executeRoomReservation()">Book Room</button>
                     </div>
                     <div>
-                        <h3>Active Room Reservations</h3>
+                        <h3>Your Room Bookings</h3>
                         <div id="student-rooms-list" class="display-box">Loading spatial maps...</div>
                     </div>
                 </div>
             </div>
 
             <div id="student-tab4" class="tab-content hidden" style="max-width: 400px;">
-                <h3>Modify System Access Phrase</h3>
-                <label>New Passphrase Definition</label>
+                <h3>Change Password</h3>
+                <label>New Password</label>
                 <input type="password" id="stud-p1">
-                <label>Confirm Passphrase Matching Layout</label>
+                <label>Confirm Password</label>
                 <input type="password" id="stud-p2">
-                <button onclick="updateStudentPassword()">Commit Profile Modification</button>
+                <button onclick="updateStudentPassword()">Save Password</button>
             </div>
         </div>
 
         <div id="librarian-view" class="view-panel hidden">
             <div class="tab-bar">
-                <button class="tab-btn active" onclick="switchTab(this, 'lib-tab1')">Catalog Processing</button>
-                <button class="tab-btn" onclick="switchTab(this, 'lib-tab2')">Fulfillments & Discipline</button>
-                <button class="tab-btn" onclick="switchTab(this, 'lib-tab3')">Master Traffic Ledger</button>
+                <button class="tab-btn active" onclick="switchTab(this, 'lib-tab1')">Books</button>
+                <button class="tab-btn" onclick="switchTab(this, 'lib-tab2')">Returns & Fines</button>
+                <button class="tab-btn" onclick="switchTab(this, 'lib-tab3')">Borrowing List</button>
             </div>
 
             <div id="lib-tab1" class="tab-content">
                 <div class="grid-2">
                     <div>
-                        <h3>Ingest / Update Material Records</h3>
-                        <p style="font-size:12px; color:#666;">Enter a valid 10 or 13 digit ISBN then blur/tab out of the field to execute automatic registry validation hooks.</p>
-                        <label>Standard Book ISBN Identification Code</label>
-                        <input type="text" id="lib-isbn" placeholder="e.g. 9780134685991" onchange="lookupOpenLibraryMetadata()">
-                        <label>Material Resource Title</label>
-                        <input type="text" id="lib-title" placeholder="Volume nomenclature title">
-                        <label>Primary Author Attribution</label>
-                        <input type="text" id="lib-author" placeholder="Author name structure">
-                        <div style="display:flex; gap:10px;">
-                            <button onclick="saveBookRecord()">Write to Catalog Storage</button>
-                            <button class="btn-danger" onclick="purgeBookRecord()">Drop Inventory Item</button>
+                        <h3>Add / Edit Book</h3>
+                        <p style="font-size:12px; color:#666;">Enter the ISBN, then the title and author can fill in automatically.</p>
+                        <label>ISBN</label>
+                        <input type="text" id="lib-isbn" placeholder="e.g. 9780134685991" onchange="lookupFetchMetabase()">
+
+                        <label>Title</label>
+                        <input type="text" id="lib-title" placeholder="Book title" onchange="lookupFetchMetabase()">
+
+                        <label>Author</label>
+                        <input type="text" id="lib-author" placeholder="Author name" onchange="lookupFetchMetabase()">
+
+                        <div style="display:flex; gap:10px; flex-wrap:wrap;">
+                            <button type="button" onclick="lookupFetchMetabase()">Fetch Metabase</button>
+                            <button type="button" onclick="saveBookRecord()">Save Book</button>
+                            <button type="button" class="btn-danger" onclick="purgeBookRecord()">Delete Book</button>
                         </div>
                     </div>
                     <div>
-                        <h3>Live Master Index</h3>
+                        <h3>Book List</h3>
                         <div id="lib-books-box" class="display-box">Loading catalogs...</div>
                     </div>
                 </div>
@@ -201,41 +205,41 @@
             <div id="lib-tab2" class="tab-content hidden">
                 <div class="grid-3">
                     <div>
-                        <h3>Counter Returns Desk</h3>
-                        <p style="font-size:12px; color:#666;">Select a record from the Master Traffic Ledger (Tab 3) marked as active to finalize return validation procedures.</p>
-                        <label>Selected Transaction ID Reference</label>
-                        <input type="text" id="lib-return-txid" readonly placeholder="No transaction active">
-                        <button style="width:100%;" onclick="confirmBookReturn()">Commit Return Receipt</button>
+                        <h3>Return Books</h3>
+                        <p style="font-size:12px; color:#666;">Select a record from the Borrowing List (Tab 3) marked as active to finalize return validation procedures.</p>
+                        <label>Selected Book</label>
+                        <select id="lib-return-txid"><option value="">Loading unreturned books...</option></select>
+                        <button style="width:100%;" onclick="confirmBookReturn()">Confirm Return</button>
                     </div>
                     <div>
-                        <h3>Account Penalty Assessment</h3>
-                        <label>Select Targeted Accounts Profile</label>
+                        <h3>Fines</h3>
+                        <label>Select Student</label>
                         <select id="lib-fine-uid"></select>
-                        <label>Fine Penalty Ledger Fee ($ USD equivalent value)</label>
+                        <label>Fine amount</label>
                         <input type="number" step="0.01" id="lib-fine-amt" value="0.00">
-                        <button style="width:100%;" onclick="applyUserFine()">Authorize Financial Discipline</button>
+                        <button style="width:100%;" onclick="applyUserFine()">Apply Fine</button>
                     </div>
                     <div>
-                        <h3>Spatial Reservation Overrides</h3>
-                        <p style="font-size:12px; color:#666;">Force-drop room reservations violating campus spatial assignment codes.</p>
+                        <h3>Room Overrides</h3>
+                        <p style="font-size:12px; color:#666;">Remove a room booking.</p>
                         <div id="lib-rooms-box" class="display-box" style="max-height: 250px;">Loading room schedules...</div>
-                        <button class="btn-danger" style="width:100%; margin-top:10px;" onclick="cancelRoomOverride()">Evict Selected Registration</button>
+                        <button class="btn-danger" style="width:100%; margin-top:10px;" onclick="cancelRoomOverride()">Delete Selected Booking</button>
                     </div>
                 </div>
             </div>
 
             <div id="lib-tab3" class="tab-content hidden">
-                <h3>Global Circulation & Document Pipeline Transactions</h3>
+                <h3>Borrowing Records</h3>
                 <div style="overflow-x:auto;">
                     <table id="lib-ledger-table">
                         <thead>
                             <tr>
-                                <th>Transaction Index Reference</th>
-                                <th>Target Document Volume</th>
-                                <th>User Account Entity</th>
-                                <th>Fulfillment Condition</th>
-                                <th>Assigned Transit Code</th>
-                                <th>Expected Dispatch Target Date</th>
+                                <th>Record ID</th>
+                                <th>Book</th>
+                                <th>User</th>
+                                <th>Status</th>
+                                <th>Claim Code</th>
+                                <th>Due Date</th>
                             </tr>
                         </thead>
                         <tbody><tr><td colspan="6">Loading master ledgers...</td></tr></tbody>
@@ -246,34 +250,34 @@
 
         <div id="admin-view" class="view-panel hidden">
             <div class="tab-bar">
-                <button class="tab-btn active" onclick="switchTab(this, 'admin-tab1')">Access Control & Directory</button>
-                <button class="tab-btn" onclick="switchTab(this, 'admin-tab2')">Data Automation & Engineering Reports</button>
+                <button class="tab-btn active" onclick="switchTab(this, 'admin-tab1')">Users</button>
+                <button class="tab-btn" onclick="switchTab(this, 'admin-tab2')">Reports</button>
             </div>
 
             <div id="admin-tab1" class="tab-content">
                 <div class="grid-2">
                     <div>
-                        <h3>Add Direct Identity Profiles</h3>
-                        <label>Generated System Identity ID Alpha-Numeric Index Code</label>
+                        <h3>Add User</h3>
+                        <label>User ID</label>
                         <input type="text" id="adm-uid" placeholder="e.g. S002, L002">
-                        <label>Account Assignment Operational Domain Authorization</label>
+                        <label>Role</label>
                         <select id="adm-role">
-                            <option value="student">Student Registry Node</option>
-                            <option value="librarian">Librarian Operations Node</option>
-                            <option value="admin">System Admin Node</option>
+                            <option value="student">Student</option>
+                            <option value="librarian">Librarian</option>
+                            <option value="admin">Admin</option>
                         </select>
-                        <label>Full Name Identity</label>
+                        <label>Full Name</label>
                         <input type="text" id="adm-name" placeholder="John Doe">
-                        <label>Official Institutional Mail Node Address</label>
+                        <label>Email</label>
                         <input type="email" id="adm-email" placeholder="username@students.nu-cebu.edu.ph">
-                        <label>Assigned Initial Passphrase Token</label>
+                        <label>Password</label>
                         <input type="text" id="adm-pass" placeholder="Initial secure entry value">
-                        <button onclick="addUserProfile()">Register Node Identity</button>
+                        <button onclick="addUserProfile()">Add User</button>
                     </div>
                     <div>
-                        <h3>Identity Management Directory System Matrix</h3>
-                        <div id="admin-users-box" class="display-box" style="max-height: 350px;">Loading matrix profiles...</div>
-                        <button class="btn-danger" style="margin-top:15px; width:100%;" onclick="deleteUserProfile()">Purge Selected Directory Node</button>
+                        <h3>User List</h3>
+                        <div id="admin-users-box" class="display-box" style="max-height: 350px;">Loading users...</div>
+                        <button class="btn-danger" style="margin-top:15px; width:100%;" onclick="deleteUserProfile()">Delete Selected User</button>
                     </div>
                 </div>
             </div>
@@ -281,16 +285,16 @@
             <div id="admin-tab2" class="tab-content hidden">
                 <div class="grid-2">
                     <div>
-                        <h3>System Resource Engineering Engine</h3>
-                        <p>Generate, construct, and evaluate system operational records metrics maps. This constructs standard engineering metrics calculations capturing system throughput operations indexes.</p>
-                        <button onclick="generateMonthlyUsageReport()">Compile Monthly Usage Ledger Map</button>
+                        <h3>Reports</h3>
+                        <p>Create a simple usage report.</p>
+                        <button onclick="generateMonthlyUsageReport()">Generate Report</button>
                         
-                        <h4 style="margin-top: 30px;">System Engine Automated Generation Log</h4>
-                        <div id="admin-reports-log" class="display-box" style="max-height: 180px;">No jobs executed in current execution lifecycle.</div>
+                        <h4 style="margin-top: 30px;">Saved Reports</h4>
+                        <div id="admin-reports-log" class="display-box" style="max-height: 180px;">No reports saved yet.</div>
                     </div>
                     <div>
-                        <h3>Active Engine Calculations Sandbox Workspace Preview</h3>
-                        <div id="report-preview-pane" style="background:#2f3542; color:#a4b0be; padding:20px; border-radius:6px; font-family: monospace; font-size:12px; white-space: pre-wrap; min-height: 300px;">Engine runtime operational preview offline. Invoke generation processing tree to build runtime data maps.</div>
+                        <h3>Report Preview</h3>
+                        <div id="report-preview-pane" style="background:#2f3542; color:#a4b0be; padding:20px; border-radius:6px; font-family: monospace; font-size:12px; white-space: pre-wrap; min-height: 300px;">No report generated yet.</div>
                     </div>
                 </div>
             </div>
@@ -299,12 +303,10 @@
     </div>
 
     <script>
-        // --- DATA CONNECTION PARAMS ---
         const supabaseUrl = 'https://zrrqbzcsefmnfvqdwocw.supabase.co';
         const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpycnFiemNzZWZtbmZ2cWR3b2N3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk5NTg0MjMsImV4cCI6MjA5NTUzNDQyM30.TAoFWIaPWY0Myn40YqYT-Sadr6hRKgzDyzfvDc9xjxQ';
         const db = window.supabase.createClient(supabaseUrl, supabaseKey);
 
-        // System state variables
         let currentUser = null;
         let selectedEntityId = null;
         let localBooks = [];
@@ -353,8 +355,67 @@
             document.getElementById('auth-status-area').innerHTML = `<button class="btn-sec" onclick="showView('login-view')">University CAS Login</button>`;
             showView('home-view');
         }
+        async function lookupFetchMetabase() {
+            const isbn = document.getElementById('lib-isbn').value.trim().replace(/-/g, '');
+            const titleInput = document.getElementById('lib-title').value.trim();
+            const authorInput = document.getElementById('lib-author').value.trim();
 
-        // ================= HOMEPAGE ENGINE DATA LAYERS =================
+            try {
+                let metadata = null;
+
+                if (isbn.length >= 10) {
+                    const res = await fetch(`https://openlibrary.org/api/books?bibkeys=ISBN:${isbn}&format=json&jscmd=data`);
+                    const data = await res.json();
+                    metadata = data[`ISBN:${isbn}`] || null;
+                }
+
+                if (!metadata && titleInput) {
+                    const res = await fetch(`https://openlibrary.org/search.json?title=${encodeURIComponent(titleInput)}&limit=1`);
+                    const data = await res.json();
+                    metadata = data.docs && data.docs.length > 0 ? data.docs[0] : null;
+                }
+
+                if (!metadata && authorInput) {
+                    const res = await fetch(`https://openlibrary.org/search.json?author=${encodeURIComponent(authorInput)}&limit=1`);
+                    const data = await res.json();
+                    metadata = data.docs && data.docs.length > 0 ? data.docs[0] : null;
+                }
+
+                if (!metadata) {
+                    console.warn("No metabase match found.");
+                    return;
+                }
+
+                const resolvedTitle =
+                    metadata.title ||
+                    metadata.name ||
+                    titleInput ||
+                    '';
+
+                const resolvedAuthor =
+                    (metadata.authors && metadata.authors[0] && metadata.authors[0].name) ||
+                    (metadata.author_name && metadata.author_name[0]) ||
+                    authorInput ||
+                    '';
+
+                const resolvedIsbn =
+                    metadata.isbn?.[0] ||
+                    metadata.identifiers?.isbn_13?.[0] ||
+                    metadata.identifiers?.isbn_10?.[0] ||
+                    isbn ||
+                    '';
+
+                document.getElementById('lib-title').value = resolvedTitle;
+                document.getElementById('lib-author').value = resolvedAuthor;
+                if (resolvedIsbn) {
+                    document.getElementById('lib-isbn').value = resolvedIsbn;
+                }
+
+            } catch (e) {
+                console.warn("Metabase lookup failed:", e);
+            }
+        }
+
         async function publicSearchBooks() {
             const term = document.getElementById('home-search-input').value.trim().toLowerCase();
             const box = document.getElementById('home-books-box');
@@ -368,7 +429,7 @@
             
             localBooks = books;
             box.innerHTML = '';
-            if(books.length === 0) { box.innerHTML = '<em>No structural records matched current logical queries.</em>'; return; }
+            if(books.length === 0) { box.innerHTML = '<em>No books matched your search.</em>'; return; }
             
             books.forEach(b => {
                 let badge = b.available ? `<span class="status-badge status-avail">Available</span>` : `<span class="status-badge status-block">Checked Out</span>`;
@@ -395,38 +456,36 @@
             await db.from('borrow_records').update({ status: 'active' }).eq('id', tx.id);
             await db.from('books').update({ available: false }).eq('isbn', tx.book_isbn);
 
-            feedback.innerText = `Token validated completely! Book volume identity ${tx.book_isbn} dispatched to registry entity account node ${tx.user_id}.`;
+            feedback.innerText = `Token validated completely! Book ${tx.book_isbn} marked as borrowed by ${tx.user_id}.`;
             feedback.style.color = 'var(--success)';
             document.getElementById('home-token-input').value = '';
             publicSearchBooks();
         }
 
-        // ================= CORE GATEWAY USER LOGIN PROCESSING =================
         async function handleLogin() {
             const identity = document.getElementById('login-ident').value.trim();
             const password = document.getElementById('login-pass').value.trim();
             const errorArea = document.getElementById('login-error');
             errorArea.innerText = "";
 
-            if(!identity || !password) { errorArea.innerText = "Fields cannot be blank."; return; }
+            if(!identity || !password) { errorArea.innerText = "Please fill in both fields."; return; }
 
             const { data: user, error } = await db.from('profiles').select('*')
                 .or(`email.eq.${identity},id.eq.${identity}`)
                 .eq('password', password)
                 .maybeSingle();
 
-            if(error || !user) { errorArea.innerText = "Authentication Failure. Invalid Identity Mapping Match."; return; }
+            if(error || !user) { errorArea.innerText = "Login failed. Check your ID and password."; return; }
 
             currentUser = user;
             document.getElementById('auth-status-area').innerHTML = `
                 <span style="color:white; margin-right:15px; font-size:14px;">[${user.role.toUpperCase()}] <strong>${user.name}</strong></span>
-                <button class="btn-danger" style="padding:6px 12px; font-size:12px;" onclick="logout()">Terminate Session</button>
+                <button class="btn-danger" style="padding:6px 12px; font-size:12px;" onclick="logout()">Logout</button>
             `;
 
             document.getElementById('login-ident').value = '';
             document.getElementById('login-pass').value = '';
 
-            // Role Routing Matrix
             if(user.role === 'student') {
                 showView('student-view');
                 renderStudentBooks();
@@ -458,7 +517,7 @@
                     box.querySelectorAll('.item-row').forEach(r => r.classList.remove('selected'));
                     div.classList.add('selected');
                     selectedEntityId = b.isbn;
-                    document.getElementById('selected-book-meta').innerHTML = `Selected Material target code: <strong>${b.isbn}</strong><br>Title: ${b.title}<br>Status Vector: ${b.available ? 'Ready for deployment' : 'Blocked'}`;
+                    document.getElementById('selected-book-meta').innerHTML = `Selected Material target code: <strong>${b.isbn}</strong><br>Title: ${b.title}<br>Status: ${b.available ? 'Available' : 'Unavailable'}`;
                     if(b.available) {
                         document.getElementById('place-hold-btn').classList.remove('hidden');
                     } else {
@@ -472,7 +531,7 @@
         async function executeHold() {
             const { data: profile } = await db.from('profiles').select('fines').eq('id', currentUser.id).single();
             if (profile.fines > 10.00) {
-                alert(`Transaction Rejected: Account profile presents fine balance of $${profile.fines}. Maximum balance allowed before suspension limit is $10.00.`);
+                alert(`This student has $${profile.fines}.  in fines. The limit is $10.00.`);
                 return;
             }
 
@@ -489,7 +548,7 @@
                 due_date: targetDueDate.toISOString().split('T')[0]
             });
 
-            if(error) { alert("Execution error processing pipeline database transaction layers."); return; }
+            if(error) { alert("Error saving the claim."); return; }
 
             document.getElementById('student-qr-area').classList.remove('hidden');
             document.getElementById('token-text-render').innerText = generatedToken;
@@ -506,7 +565,7 @@
             const box = document.getElementById('student-history-box');
             const { data: records } = await db.from('borrow_records').select('*, books(title)').eq('user_id', currentUser.id);
             box.innerHTML = '';
-            if(!records || records.length === 0) { box.innerHTML = '<p style="font-size:12px; color:#888;">No historical matrix tracks detected.</p>'; return; }
+            if(!records || records.length === 0) { box.innerHTML = '<p style="font-size:12px; color:#888;">No history found.</p>'; return; }
 
             let tableHTML = `<table><thead><tr><th>Document Unit Volume</th><th>Condition Status</th><th>Due Date Bound</th></tr></thead><tbody>`;
             records.forEach(r => {
@@ -553,7 +612,7 @@
 
             if(!rdate) { alert("Spatial schedule execution parameters require clear explicit calendar targeting indices."); return; }
             if(!invites.includes('@') && invites.length > 0) {
-                alert("Validation processing failed: Team mapping string requires valid structural data format configurations (comma-separated syntax). Execution blocked.");
+                alert("Invite emails must be comma-separated.");
                 return;
             }
 
@@ -565,7 +624,7 @@
                 invite_emails: invites
             });
 
-            alert(`Spatial grid framework locked. Unit identifier ${room} structural assignment processing complete.`);
+            alert(`Room booked: ${room}.`);
             document.getElementById('room-invites-input').value = '';
             renderStudentReservations();
         }
@@ -573,10 +632,10 @@
         async function updateStudentPassword() {
             const p1 = document.getElementById('stud-p1').value;
             const p2 = document.getElementById('stud-p2').value;
-            if(!p1 || p1 !== p2) { alert("Data stream logic error: Passphrase definitions missing structural validation parity."); return; }
+            if(!p1 || p1 !== p2) { alert("Passwords do not match."); return; }
 
             await db.from('profiles').update({ password: p1 }).eq('id', currentUser.id);
-            alert("Security matrix re-engineered. Authentication sequence structures synchronized safely.");
+            alert("Password updated.");
             document.getElementById('stud-p1').value = '';
             document.getElementById('stud-p2').value = '';
         }
@@ -624,12 +683,12 @@
             const isbn = document.getElementById('lib-isbn').value.trim();
             const title = document.getElementById('lib-title').value.trim();
             const author = document.getElementById('lib-author').value.trim();
-            if(!isbn || !title) { alert("Structural definitions bound data formatting failure."); return; }
+            if(!isbn || !title) { alert("Please fill in all required fields."); return; }
 
             const { error } = await db.from('books').upsert({ isbn, title, author, available: true });
-            if(error) { alert("Database validation error writing records catalog matrix elements."); return; }
+            if(error) { alert("Could not save the book."); return; }
             
-            alert("Master inventory indexes systematically mapped.");
+            alert("Book saved.");
             clearLibBookForm();
             renderLibrarianBooks();
         }
@@ -637,7 +696,7 @@
         async function purgeBookRecord() {
             if(!selectedEntityId) { alert("Select targeted document row vector first."); return; }
             await db.from('books').delete().eq('isbn', selectedEntityId);
-            alert("Structural row purged out from memory mapping tracking systems safely.");
+            alert("Book deleted.");
             clearLibBookForm();
             renderLibrarianBooks();
         }
@@ -651,7 +710,7 @@
 
         async function loadLibrarianFulfillmentData() {
             const select = document.getElementById('lib-fine-uid');
-            const { data: users } = await db.from('profiles').select('id, name');
+            const { data: users } = await db.from('profiles').select('id, name').eq('role', 'student');
             select.innerHTML = '';
             users.forEach(u => {
                 select.innerHTML += `<option value="${u.id}">${u.name} [${u.id}]</option>`;
@@ -660,15 +719,15 @@
             const roomBox = document.getElementById('lib-rooms-box');
             const { data: reservations } = await db.from('room_reservations').select('*');
             roomBox.innerHTML = '';
-            if(!reservations || reservations.length === 0) { roomBox.innerHTML = "<em>No physical facilities registered globally.</em>"; return; }
+            if(!reservations || reservations.length === 0) { roomBox.innerHTML = "<em>No room bookings found.</em>"; return; }
             reservations.forEach(r => {
                 let div = document.createElement('div');
                 div.className = 'item-row';
-                div.innerHTML = `<div><strong>${r.room_name}</strong><br><small>Account Node: ${r.user_id} | ${r.reservation_date} [${r.time_slot}]</small></div>`;
+                div.innerHTML = `<div><strong>${r.room_name}</strong><br><small>Account: ${r.user_id} | ${r.reservation_date} [${r.time_slot}]</small></div>`;
                 div.onclick = () => {
                     roomBox.querySelectorAll('.item-row').forEach(row => row.classList.remove('selected'));
                     div.classList.add('selected');
-                    selectedEntityId = r.id; // Spatial UUID track mapped
+                    selectedEntityId = r.id;
                 };
                 roomBox.appendChild(div);
             });
@@ -676,13 +735,13 @@
 
         async function confirmBookReturn() {
             const txid = document.getElementById('lib-return-txid').value;
-            if(!txid) { alert("Select transaction trace element mapping sequence block parameter first inside Tab 3."); return; }
+            if(!txid) { alert("Please choose an unreturned book."); return; }
 
             const { data: tx } = await db.from('borrow_records').select('*').eq('id', txid).single();
             await db.from('borrow_records').update({ status: 'returned' }).eq('id', txid);
             await db.from('books').update({ available: true }).eq('isbn', tx.book_isbn);
 
-            alert("Fulfillment tracking matrix records updated completely. Book marked available.");
+            alert("Return saved. Book is now available.");
             document.getElementById('lib-return-txid').value = '';
             renderMasterLedgers();
             renderLibrarianBooks();
@@ -691,27 +750,53 @@
         async function applyUserFine() {
             const uid = document.getElementById('lib-fine-uid').value;
             const amt = parseFloat(document.getElementById('lib-fine-amt').value);
-            
-            const { data: profile } = await db.from('profiles').select('fines').eq('id', uid).single();
+
+            const { data: profile } = await db.from('profiles').select('fines, role').eq('id', uid).single();
+            if(!profile || profile.role !== 'student') {
+                alert("Fines can only be added to students.");
+                return;
+            }
+
             let newBalance = (parseFloat(profile.fines || 0) + amt).toFixed(2);
 
             await db.from('profiles').update({ fines: newBalance }).eq('id', uid);
-            alert(`Financial discipline authorized. Identity card trace map ${uid} penalty collection balances adapted directly to system.`);
+            alert(`Fine added for ${uid}.`);
         }
 
         async function cancelRoomOverride() {
-            if(!selectedEntityId) { alert("Target a system room allocation reference key block first inside the display list box."); return; }
+            if(!selectedEntityId) { alert("Please select a room booking first."); return; }
             await db.from('room_reservations').delete().eq('id', selectedEntityId);
-            alert("Spatial grid lock overridden and dropped safely.");
+            alert("Room booking deleted.");
             selectedEntityId = null;
             loadLibrarianFulfillmentData();
         }
 
         async function renderMasterLedgers() {
             const tbody = document.getElementById('lib-ledger-table').querySelector('tbody');
-            const { data: masterTx } = await db.from('borrow_records').select('*');
+            const returnSelect = document.getElementById('lib-return-txid');
+            const { data: masterTx } = await db.from('borrow_records').select('*, books(title)');
             tbody.innerHTML = '';
-            if(!masterTx || masterTx.length === 0) { tbody.innerHTML = `<tr><td colspan="6">Matrix pipelines empty.</td></tr>`; return; }
+            if(!masterTx || masterTx.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="6">No records found.</td></tr>`;
+                if (returnSelect) returnSelect.innerHTML = '<option value="">No unreturned books</option>';
+                return;
+            }
+
+            const activeTx = masterTx.filter(tx => tx.status === 'active');
+            if (returnSelect) {
+                returnSelect.innerHTML = '';
+                if (activeTx.length === 0) {
+                    returnSelect.innerHTML = '<option value="">No unreturned books</option>';
+                } else {
+                    returnSelect.innerHTML = '<option value="">Choose a book</option>';
+                    activeTx.forEach(tx => {
+                        const opt = document.createElement('option');
+                        opt.value = tx.id;
+                        opt.textContent = `${tx.books ? tx.books.title : tx.book_isbn} | ${tx.user_id} | ${tx.due_date}`;
+                        returnSelect.appendChild(opt);
+                    });
+                }
+            }
 
             masterTx.forEach(tx => {
                 let tr = document.createElement('tr');
@@ -719,7 +804,7 @@
                 if(tx.status === 'active') tr.style.background = '#fffde6';
                 tr.innerHTML = `
                     <td><small style="font-family:monospace">${tx.id}</small></td>
-                    <td>${tx.book_isbn}</td>
+                    <td>${tx.books ? tx.books.title : tx.book_isbn}</td>
                     <td><strong>${tx.user_id}</strong></td>
                     <td><span class="status-badge ${tx.status==='returned'?'status-avail':'status-block'}">${tx.status}</span></td>
                     <td><code>${tx.borrow_token || 'N/A'}</code></td>
@@ -727,10 +812,10 @@
                 `;
                 tr.onclick = () => {
                     if(tx.status === 'active') {
-                        document.getElementById('lib-return-txid').value = tx.id;
+                        if (returnSelect) returnSelect.value = tx.id;
                         switchTab(document.querySelector('[onclick*="lib-tab2"]'), 'lib-tab2');
                     } else {
-                        alert("Selected routing path transaction entity structure already completely resolved.");
+                        alert("This record is already returned.");
                     }
                 };
                 tbody.appendChild(tr);
@@ -745,7 +830,7 @@
             users.forEach(u => {
                 let div = document.createElement('div');
                 div.className = 'item-row';
-                let subtext = u.role === 'student' ? `Fines balance metrics tracking: $${u.fines || '0.00'}` : `System Authorized Token Clearance`;
+                let subtext = u.role === 'student' ? `Fine balance: $${u.fines || '0.00'}` : `Admin/Librarian access`;
                 div.innerHTML = `<div><strong>${u.name}</strong> [${u.role.toUpperCase()}]<br><small>System ID Reference: ${u.id} | ${subtext}</small></div>`;
                 div.onclick = () => {
                     box.querySelectorAll('.item-row').forEach(row => row.classList.remove('selected'));
@@ -766,24 +851,23 @@
             if(!id || !name || !email || !password) { alert("Database constraints reject structural integrity processing configurations."); return; }
 
             await db.from('profiles').insert({ id, role, name, email, password, fines: 0.0 });
-            alert(`Identity tracking parameters integrated into system matrix indexes.`);
+            alert(`User added.`);
             
             ['adm-uid', 'adm-name', 'adm-email', 'adm-pass'].forEach(id => document.getElementById(id).value = '');
             renderAdminProfiles();
         }
 
         async function deleteUserProfile() {
-            if(!selectedEntityId) { alert("Select targeted profile identity row matrix component first inside display registry box."); return; }
+            if(!selectedEntityId) { alert("Please select a user first."); return; }
             
             const target = localProfiles.find(p => p.id === selectedEntityId);
             if(target && (target.role === 'librarian' || target.role === 'admin')) {
-                // Rule: Verify structural constraints to prevent execution sequence failures
-                alert("Core Framework Security Exception: Active management cluster elements (Admin / Librarian nodes) cannot be context-dropped directly via standard layout engines.");
+                alert("Core Framework Security Exception: Admin and librarian accounts cannot be deleted here.");
                 return;
             }
 
             await db.from('profiles').delete().eq('id', selectedEntityId);
-            alert("Directory space node identity track completely deleted.");
+            alert("User deleted.");
             selectedEntityId = null;
             renderAdminProfiles();
         }
@@ -792,18 +876,18 @@
             const logs = JSON.parse(localStorage.getItem('nu_library_reports_log') || '[]');
             const logBox = document.getElementById('admin-reports-log');
             logBox.innerHTML = '';
-            if(logs.length === 0) { logBox.innerHTML = '<em>No structural calculation logs stored in framework space.</em>'; return; }
+            if(logs.length === 0) { logBox.innerHTML = '<em>No reports saved yet.</em>'; return; }
             logs.forEach((log, idx) => {
                 logBox.innerHTML += `
                     <div style="background:white; border:1px solid var(--gray); padding:8px; border-radius:4px; margin-bottom:5px; font-size:11px; cursor:pointer;" onclick="previewHistoricalReport(${idx})">
-                        📁 <strong>Report System Output Run #${idx+1}</strong><br><small style="color:#666">${log.timestamp}</small>
+                        📁 <strong>Report #${idx+1}</strong><br><small style="color:#666">${log.timestamp}</small>
                     </div>`;
             });
         }
 
         async function generateMonthlyUsageReport() {
             const previewPane = document.getElementById('report-preview-pane');
-            previewPane.innerText = "Running calculations tracking pipelines across cloud matrices...";
+            previewPane.innerText = "Generating report...";
 
             const { data: books } = await db.from('books').select('*');
             const { data: profiles } = await db.from('profiles').select('*');
@@ -811,7 +895,7 @@
             const { data: spatial } = await db.from('room_reservations').select('*');
 
             const timestampStr = new Date().toLocaleString();
-            
+
             let reportPayload = {
                 timestamp: timestampStr,
                 total_cataloged_volumes: books ? books.length : 0,
@@ -823,34 +907,29 @@
                 cumulative_outstanding_system_fines: profiles ? profiles.reduce((acc, curr) => acc + parseFloat(curr.fines || 0), 0).toFixed(2) : "0.00"
             };
 
-            let formattedTextReport = `==================================================
-NU CEBU ARCHIVAL CORE RESOURCE SYSTEM METRICS ANALYSIS
-AUTOMATED COMPILATION REPORT RUN TIME TRACK: ${reportPayload.timestamp}
-==================================================
+            let formattedTextReport = `============================================
+NU CEBU LIBRARY REPORT
+Generated: ${reportPayload.timestamp}
+============================================
 
-[1] VOLUME INVENTORY LOGISTICS MATRIX
-    --> Cumulative Cataloged Database Volumes  : ${reportPayload.total_cataloged_volumes} units
-    --> Document Isolation Hold Pipeline Rows  : ${reportPayload.calculated_active_holds} traces
-    --> Live Dispatched Document Loans Track   : ${reportPayload.calculated_active_loans} volumes
+Books: ${reportPayload.total_cataloged_volumes}
+On hold: ${reportPayload.calculated_active_holds}
+Borrowed: ${reportPayload.calculated_active_loans}
 
-[2] IDENTITY AND TENANT METRICS TRACK
-    --> Active System Database Registry Nodes  : ${reportPayload.active_registered_profiles} accounts
-    --> Cumulative Active Framework Fine Pools : $${reportPayload.cumulative_outstanding_system_fines} USD
+Users: ${reportPayload.active_registered_profiles}
+Total fines: $${reportPayload.cumulative_outstanding_system_fines}
 
-[3] SPATIAL LOGISTICS SCHEDULING DISPATCHES
-    --> Workspace Spatial Assignments Logged   : ${reportPayload.facility_reservations_logged} events
-    
-[SYSTEM STATUS ASSESSMENT] Framework operation calculations functional. 
-All pipeline variables running within standard baseline operational metrics.
---------------------------------------------------
-[METRICS CALCULATED BY AUTOMATED MAINTENANCE SYSTEM]`;
+Room bookings: ${reportPayload.facility_reservations_logged}
+
+Report ready.
+--------------------------------------------`;
 
             previewPane.innerText = formattedTextReport;
 
             const currentLogs = JSON.parse(localStorage.getItem('nu_library_reports_log') || '[]');
             currentLogs.unshift({ timestamp: timestampStr, rawText: formattedTextReport });
             localStorage.setItem('nu_library_reports_log', JSON.stringify(currentLogs));
-            
+
             renderAdminReportsLog();
         }
 
