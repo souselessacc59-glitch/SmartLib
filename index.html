@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>NU Cebu Library System</title>
@@ -556,7 +557,13 @@
 
             document.getElementById('student-qr-area').classList.remove('hidden');
             document.getElementById('token-text-render').innerText = generatedToken;
-            document.getElementById('qr-target').innerText = `[ || | |||| | ]\n${generatedToken}`;
+            const qrTarget = document.getElementById('qr-target');
+            qrTarget.innerHTML = "";
+            
+            QRCode.toCanvas(generatedToken, { width: 160 }, function (err, canvas) {
+                if (err) console.error(err);
+                qrTarget.appendChild(canvas);
+            });
 
             document.getElementById('place-hold-btn').classList.add('hidden');
             document.getElementById('selected-book-meta').innerHTML = "<em>Hold processing allocated. Complete registration vector steps.</em>";
@@ -862,16 +869,29 @@
         }
 
         async function deleteUserProfile() {
-            if(!selectedEntityId) { alert("Please select a user first."); return; }
-            
+            if(!selectedEntityId) { 
+                alert("Select a user first."); 
+                return; 
+            }
+        
             const target = localProfiles.find(p => p.id === selectedEntityId);
+        
             if(target && (target.role === 'librarian' || target.role === 'admin')) {
-                alert("Core Framework Security Exception: Admin and librarian accounts cannot be deleted here.");
+                alert("Admins and librarians cannot be deleted.");
                 return;
             }
-
-            await db.from('profiles').delete().eq('id', selectedEntityId);
-            alert("User deleted.");
+        
+            const { error } = await db
+                .from('profiles')
+                .delete()
+                .eq('id', selectedEntityId);
+        
+            if (error) {
+                alert("Delete failed: " + error.message);
+                return;
+            }
+        
+            alert("User deleted successfully.");
             selectedEntityId = null;
             renderAdminProfiles();
         }
