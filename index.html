@@ -398,12 +398,16 @@
                     authorInput ||
                     '';
 
-                const resolvedIsbn =
+                let resolvedIsbn =
                     metadata.isbn?.[0] ||
                     metadata.identifiers?.isbn_13?.[0] ||
                     metadata.identifiers?.isbn_10?.[0] ||
                     isbn ||
                     '';
+                
+                if (!resolvedIsbn) {
+                    resolvedIsbn = "GEN-" + Math.floor(100000000 + Math.random() * 900000000);
+                }
 
                 document.getElementById('lib-title').value = resolvedTitle;
                 document.getElementById('lib-author').value = resolvedAuthor;
