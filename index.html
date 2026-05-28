@@ -7,8 +7,8 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         :root {
-            --primary: #3a0007; /* NU Maroon */
-            --secondary: #ffd700; /* NU Gold */
+            --primary: #0000FF;
+            --secondary: #ffd700;
             --dark: #2c3e50;
             --light: #f8f9fa;
             --gray: #dfe4ea;
@@ -22,23 +22,19 @@
         .view-panel { background: white; padding: 30px; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
         .hidden { display: none !important; }
         
-        /* Form controls */
         input, select, textarea { width: 100%; padding: 10px; margin: 8px 0 18px 0; border: 1px solid var(--gray); border-radius: 4px; box-sizing: border-box; font-size: 14px; }
         button { background: var(--primary); color: white; border: none; padding: 11px 20px; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 14px; transition: opacity 0.2s; }
         button:hover { opacity: 0.9; }
         .btn-sec { background: var(--secondary); color: var(--primary); }
         .btn-danger { background: var(--danger); }
         
-        /* Grid Layouts */
         .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; }
         .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px; }
         
-        /* Tab System */
         .tab-bar { display: flex; border-bottom: 2px solid var(--gray); margin-bottom: 25px; gap: 5px; }
         .tab-btn { background: #e4e7eb; color: var(--dark); border-radius: 4px 4px 0 0; padding: 10px 20px; }
         .tab-btn.active { background: var(--primary); color: white; }
         
-        /* Cards & Lists */
         .display-box { border: 1px solid var(--gray); border-radius: 6px; max-height: 400px; overflow-y: auto; padding: 10px; background: var(--light); }
         .item-row { background: white; padding: 12px; border-radius: 4px; margin-bottom: 8px; border-left: 5px solid #ccc; display: flex; justify-content: space-between; align-items: center; cursor: pointer; transition: transform 0.1s; }
         .item-row:hover { transform: scale(1.01); }
@@ -47,7 +43,6 @@
         .status-avail { background: #e3fcef; color: #00875a; }
         .status-block { background: #ffebe6; color: #de350b; }
         
-        /* Table styles */
         table { width: 100%; border-collapse: collapse; margin-top: 15px; background: white; }
         th, td { text-align: left; padding: 12px; border-bottom: 1px solid var(--gray); font-size: 14px; }
         th { background: #f4f5f7; color: var(--dark); font-weight: 600; }
@@ -450,7 +445,6 @@
             }
         }
 
-        // ================= STUDENT CONTEXT MODULE DRIVERS =================
         async function renderStudentBooks() {
             const box = document.getElementById('student-books-box');
             const { data: books } = await db.from('books').select('*');
@@ -476,7 +470,6 @@
         }
 
         async function executeHold() {
-            // Re-fetch fine matrix array vectors to verify compliance rule boundaries.
             const { data: profile } = await db.from('profiles').select('fines').eq('id', currentUser.id).single();
             if (profile.fines > 10.00) {
                 alert(`Transaction Rejected: Account profile presents fine balance of $${profile.fines}. Maximum balance allowed before suspension limit is $10.00.`);
@@ -498,7 +491,6 @@
 
             if(error) { alert("Execution error processing pipeline database transaction layers."); return; }
 
-            // Render token graphics component data layout
             document.getElementById('student-qr-area').classList.remove('hidden');
             document.getElementById('token-text-render').innerText = generatedToken;
             document.getElementById('qr-target').innerText = `[ || | |||| | ]\n${generatedToken}`;
@@ -589,7 +581,6 @@
             document.getElementById('stud-p2').value = '';
         }
 
-        // ================= LIBRARIAN CONTEXT MODULE DRIVERS =================
         async function renderLibrarianBooks() {
             const box = document.getElementById('lib-books-box');
             const { data: books } = await db.from('books').select('*');
@@ -746,7 +737,6 @@
             });
         }
 
-        // ================= ADMINISTRATIVE CONTROL DOMAIN RUNTIMES =================
         async function renderAdminProfiles() {
             const box = document.getElementById('admin-users-box');
             const { data: users } = await db.from('profiles').select('*');
@@ -778,7 +768,6 @@
             await db.from('profiles').insert({ id, role, name, email, password, fines: 0.0 });
             alert(`Identity tracking parameters integrated into system matrix indexes.`);
             
-            // Clear identity creation inputs
             ['adm-uid', 'adm-name', 'adm-email', 'adm-pass'].forEach(id => document.getElementById(id).value = '');
             renderAdminProfiles();
         }
@@ -816,7 +805,6 @@
             const previewPane = document.getElementById('report-preview-pane');
             previewPane.innerText = "Running calculations tracking pipelines across cloud matrices...";
 
-            // Structural aggregation data gathering calculations directly from the active ecosystem tables
             const { data: books } = await db.from('books').select('*');
             const { data: profiles } = await db.from('profiles').select('*');
             const { data: txs } = await db.from('borrow_records').select('*');
@@ -824,7 +812,6 @@
 
             const timestampStr = new Date().toLocaleString();
             
-            // Report calculations breakdown payload mapping
             let reportPayload = {
                 timestamp: timestampStr,
                 total_cataloged_volumes: books ? books.length : 0,
@@ -860,7 +847,6 @@ All pipeline variables running within standard baseline operational metrics.
 
             previewPane.innerText = formattedTextReport;
 
-            // Save processing logs safely inside infrastructure browser frame metrics array tracking maps
             const currentLogs = JSON.parse(localStorage.getItem('nu_library_reports_log') || '[]');
             currentLogs.unshift({ timestamp: timestampStr, rawText: formattedTextReport });
             localStorage.setItem('nu_library_reports_log', JSON.stringify(currentLogs));
