@@ -561,12 +561,21 @@
             document.getElementById('student-qr-area').classList.remove('hidden');
             document.getElementById('token-text-render').innerText = generatedToken;
             const qrTarget = document.getElementById('qr-target');
-            qrTarget.innerHTML = "";
-            
-            QRCode.toCanvas(generatedToken, { width: 160 }, function (err, canvas) {
-                if (err) console.error(err);
-                qrTarget.appendChild(canvas);
-            });
+                qrTarget.innerHTML = '';
+                
+                if (window.QRCode && QRCode.toCanvas) {
+                    const canvas = document.createElement('canvas');
+                    QRCode.toCanvas(canvas, generatedToken, { width: 160, margin: 1 }, function (err) {
+                        if (err) {
+                            console.error(err);
+                            qrTarget.innerText = generatedToken;
+                            return;
+                        }
+                        qrTarget.appendChild(canvas);
+                    });
+                } else {
+                    qrTarget.innerText = generatedToken;
+                }
 
             document.getElementById('place-hold-btn').classList.add('hidden');
             document.getElementById('selected-book-meta').innerHTML = "<em>Hold processing allocated. Complete registration vector steps.</em>";
@@ -835,7 +844,42 @@
                 tbody.appendChild(tr);
             });
         }
-
+        async function addUserProfile() {
+            const id = document.getElementById('adm-uid').value.trim();
+            const role = document.getElementById('adm-role').value;
+            const name = document.getElementById('adm-name').value.trim();
+            const email = document.getElementById('adm-email').value.trim();
+            const password = document.getElementById('adm-pass').value.trim();
+        
+            if (!id || !name || !email || !password) {
+                alert("Please fill in all required fields.");
+                return;
+            }
+        
+            const payload = {
+                id,
+                role,
+                name,
+                email,
+                password,
+                fines: 0.0
+            };
+        
+            const { error } = await db.from('profiles').upsert(payload, { onConflict: 'id' });
+        
+            if (error) {
+                alert("Add user failed: " + error.message);
+                return;
+            }
+        
+            alert("User added successfully.");
+        
+            ['adm-uid', 'adm-name', 'adm-email', 'adm-pass'].forEach(fieldId => {
+                document.getElementById(fieldId).value = '';
+            });
+        
+            renderAdminProfiles();
+        }
         async function renderAdminProfiles() {
             const box = document.getElementById('admin-users-box');
         
