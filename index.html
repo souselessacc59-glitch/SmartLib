@@ -835,63 +835,91 @@
 
         async function renderAdminProfiles() {
             const box = document.getElementById('admin-users-box');
-            const { data: users } = await db.from('profiles').select('*').eq('is_active', true);
+        
+            const { data: users, error } = await db.from('profiles').select('*');
+            if (error) {
+                box.innerHTML = `<em>Error loading users: ${error.message}</em>`;
+                return;
+            }
+        
             box.innerHTML = '';
-            localProfiles = users;
-            users.forEach(u => {
-                let div = document.createElement('div');
+            localProfiles = users || [];
+        
+            if (localProfiles.length === 0) {
+                box.innerHTML = '<em>No users found.</em>';
+                return;
+            }
+        
+            localProfiles.forEach(u => {
+                const div = document.createElement('div');
                 div.className = 'item-row';
-                let subtext = u.role === 'student' ? `Fine balance: $${u.fines || '0.00'}` : `Admin/Librarian access`;
-                div.innerHTML = `<div><strong>${u.name}</strong> [${u.role.toUpperCase()}]<br><small>System ID Reference: ${u.id} | ${subtext}</small></div>`;
+        
+                const subtext = u.role === 'student'
+                    ? `Fine balance: $${u.fines || '0.00'}`
+                    : `Admin/Librarian access`;
+        
+                div.innerHTML = `
+                    <div>
+                        <strong>${u.name}</strong> [${u.role.toUpperCase()}]<br>
+                        <small>System ID Reference: ${u.id} | ${subtext}</small>
+                    </div>
+                `;
+        
                 div.onclick = () => {
                     box.querySelectorAll('.item-row').forEach(row => row.classList.remove('selected'));
                     div.classList.add('selected');
                     selectedEntityId = u.id;
                 };
+        
                 box.appendChild(div);
             });
         }
 
-        async function addUserProfile() {
-            const id = document.getElementById('adm-uid').value.trim();
-            const role = document.getElementById('adm-role').value;
-            const name = document.getElementById('adm-name').value.trim();
-            const email = document.getElementById('adm-email').value.trim();
-            const password = document.getElementById('adm-pass').value.trim();
-
-            if(!id || !name || !email || !password) { alert("Database constraints reject structural integrity processing configurations."); return; }
-
-            await db.from('profiles').insert({ id, role, name, email, password, fines: 0.0 });
-            alert(`User added.`);
-            
-            ['adm-uid', 'adm-name', 'adm-email', 'adm-pass'].forEach(id => document.getElementById(id).value = '');
-            renderAdminProfiles();
-        }
-
         async function deleteUserProfile() {
-            if(!selectedEntityId) { 
-                alert("Select a user first."); 
-                return; 
+            if (!selectedEntityId) {
+                alert("Select a user first.");
+                return;
             }
         
             const target = localProfiles.find(p => p.id === selectedEntityId);
         
-            if(target && (target.role === 'librarian' || target.role === 'admin')) {
-                alert("Admins and librarians cannot be removed.");
+            if (target && (target.role === 'librarian' || target.role === 'admin')) {
+                alert("Admins and librarians cannot be deleted here.");
                 return;
             }
         
-            const { error } = await db
+            // Remove dependent rows first so the foreign key does not block deletion
+            const { error: borrowError } = await db
+                .from('borrow_records')
+                .delete()
+                .eq('user_id', selectedEntityId);
+        
+            if (borrowError) {
+                alert("Failed to remove borrowing records: " + borrowError.message);
+                return;
+            }
+        
+            const { error: roomError } = await db
+                .from('room_reservations')
+                .delete()
+                .eq('user_id', selectedEntityId);
+        
+            if (roomError) {
+                alert("Failed to remove room bookings: " + roomError.message);
+                return;
+            }
+        
+            const { error: userError } = await db
                 .from('profiles')
-                .update({ is_active: false })
+                .delete()
                 .eq('id', selectedEntityId);
         
-            if (error) {
-                alert("Action failed: " + error.message);
+            if (userError) {
+                alert("Delete failed: " + userError.message);
                 return;
             }
         
-            alert("User deactivated.");
+            alert("User deleted successfully.");
             selectedEntityId = null;
             renderAdminProfiles();
         }
