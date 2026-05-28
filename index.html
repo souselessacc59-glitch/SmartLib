@@ -835,7 +835,7 @@
 
         async function renderAdminProfiles() {
             const box = document.getElementById('admin-users-box');
-            const { data: users } = await db.from('profiles').select('*');
+            const { data: users } = await db.from('profiles').select('*').eq('is_active', true);
             box.innerHTML = '';
             localProfiles = users;
             users.forEach(u => {
@@ -877,21 +877,21 @@
             const target = localProfiles.find(p => p.id === selectedEntityId);
         
             if(target && (target.role === 'librarian' || target.role === 'admin')) {
-                alert("Admins and librarians cannot be deleted.");
+                alert("Admins and librarians cannot be removed.");
                 return;
             }
         
             const { error } = await db
                 .from('profiles')
-                .delete()
+                .update({ is_active: false })
                 .eq('id', selectedEntityId);
         
             if (error) {
-                alert("Delete failed: " + error.message);
+                alert("Action failed: " + error.message);
                 return;
             }
         
-            alert("User deleted successfully.");
+            alert("User deactivated.");
             selectedEntityId = null;
             renderAdminProfiles();
         }
